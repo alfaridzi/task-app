@@ -10,6 +10,6 @@
 
     php artisan migrate
 
-    php artisan serve
+    run https://localhost/quickstart/public/
 
 [Complete Tutorial](https://laravel.com/docs/5.2/quickstart)

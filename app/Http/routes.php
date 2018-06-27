@@ -11,58 +11,19 @@
 |
 */
 
-use App\Task;
-use Illuminate\Http\Request;
-
 Route::group(['middleware' => ['web']], function () {
-    /**
-     * Show Task Dashboard
-     */
-    Route::get('/', function () {
-        return view('tasks', [
-            'tasks' => Task::orderBy('created_at', 'asc')->get()
-        ]);
-    });
-
-    /**
-     * Add New Task
-     */
-    Route::post('/task', function (Request $request) {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect('/')
-                ->withInput()
-                ->withErrors($validator);
-        }
-
-        $task = new Task;
-        $task->name = $request->name;
-        $task->save();
-
-        return redirect('/');
-    });
-
-    /**
-     * Delete Task
-     */
-    Route::delete('/task/{id}', function ($id) {
-        Task::findOrFail($id)->delete();
-
-        return redirect('/');
-    });
-});
-
-Route::group(['middleware' => 'web'], function () {
-    Route::auth();
-
-    Route::get('/home', 'HomeController@index');
-
-
-    Route::get('/home', 'HomeController@index')->name('home');
+Route::auth();
 Route::get('auth/{provider}', 'Auth\AuthController@redirectToProvider');
 Route::get('auth/{provider}/callback', 'Auth\AuthController@handleProviderCallback');
 
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/', 'taskController@index');
+    Route::get('/finish', 'taskController@finishTask');
+    Route::post('/update/{id}', 'taskController@updateTask');
+    Route::post('/task', 'taskController@addTask');
+    Route::delete('/task/{id}', 'taskController@deleteTask');
+    Route::get('/task/finish/{id}','taskController@updateToFinishedTask');
 });
+
+});
+

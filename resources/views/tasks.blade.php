@@ -1,6 +1,28 @@
 @extends('layouts.app')
 
 @section('content')
+
+
+<script type="text/javascript">
+     function editForm(number) {
+        var task = $('#'+number).data().task;
+        $("input[name='name'").val(task);
+        $('#tambah').html('<i class="fa fa-btn fa-pencil"></i>Edit Task');
+        $('#cancel').remove();
+        $('#tambah').after('<button onClick="cancelEdt()" id="cancel" type="button" class="btn btn-warning"><i class="fa fa-btn fa-times"></i>Cancel</button>')
+        document.newtask.action = "{{url('/update')}}/" + number;
+    }
+
+
+    function cancelEdt() {
+        $("input[name='name'").val('');
+        $('#tambah').html('<i class="fa fa-btn fa-plus"></i>Add Task');
+        $('#cancel').remove();
+        document.newtask.action = "{{url('/task')}}/";
+    }
+</script>
+
+
     <div class="container">
         <div class="col-sm-offset-2 col-sm-8">
             <div class="panel panel-default">
@@ -13,7 +35,7 @@
                     @include('common.errors')
 
                     <!-- New Task Form -->
-                    <form action="{{ url('task')}}" method="POST" class="form-horizontal">
+                    <form action="{{ url('task')}}" method="POST" class="form-horizontal" name="newtask">
                         {{ csrf_field() }}
 
                         <!-- Task Name -->
@@ -28,7 +50,7 @@
                         <!-- Add Task Button -->
                         <div class="form-group">
                             <div class="col-sm-offset-3 col-sm-6">
-                                <button type="submit" class="btn btn-default">
+                                <button id="tambah" type="submit" class="btn btn-default" style="margin-right:5px">
                                     <i class="fa fa-btn fa-plus"></i>Add Task
                                 </button>
                             </div>
@@ -40,7 +62,7 @@
             <!-- Current Tasks -->
             @if (count($tasks) > 0)
                 <div class="panel panel-default">
-                    <div class="panel-heading">
+                    <div class="panel-heading"> 
                         Current Tasks
                     </div>
 
@@ -51,19 +73,31 @@
                                 <th>&nbsp;</th>
                             </thead>
                             <tbody>
+
+
+
                                 @foreach ($tasks as $task)
                                     <tr>
                                         <td class="table-text"><div>{{ $task->name }}</div></td>
 
                                         <!-- Task Delete Button -->
                                         <td>
-                                            <form action="{{ url('task/'.$task->id) }}" method="POST">
+                                            <form action="{{ url('task/'.$task->id) }}" method="POST" >
                                                 {{ csrf_field() }}
                                                 {{ method_field('DELETE') }}
 
-                                                <button type="submit" class="btn btn-danger">
+                                                <button onClick="return confirm('are you sure you want to delete this data?')" type="submit" class="btn btn-danger">
                                                     <i class="fa fa-btn fa-trash"></i>Delete
                                                 </button>
+
+                                                 <button type="button" id="{{$task->id}}" class="btn btn-primary" onClick="editForm({{ $task->id }})" data-task="{{ $task->name }}">
+                                                    <i class="fa fa-btn fa-pencil"></i>Edit
+                                                </button>
+
+
+                                                 <a href="{{ url('task/finish/'.$task->id) }}"  id="{{$task->id}}" class="btn btn-success">
+                                                    <i class="fa fa-btn fa-check"></i>Finish
+                                                </a>
                                             </form>
                                         </td>
                                     </tr>
@@ -75,4 +109,8 @@
             @endif
         </div>
     </div>
+@endsection
+
+@section('javascript')
+
 @endsection
